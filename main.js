@@ -27,7 +27,7 @@ const app = express();
 app.use(express.static('bin'));
 app.get('/', (req, res) => {
     res.setHeader("Set-Cockie", `sid=${sid}; Max-Age=120; HttpOnly`);
-    res.sendFile(_dir + '/bin/index.html');
+    res.sendFile(__dir + '/bin/index.html');
 });
 app.get('/login', (req, res) => {});
 app.post('/login', (req, res) => {});
