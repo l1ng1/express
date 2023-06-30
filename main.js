@@ -23,16 +23,23 @@ let sessions = {};
 let sid = getSID();
 sessions[sid] = new Session(sid);
 
-
-
+// const captcha = new Captcha.default();
+// captcha.PNGStream.pipe(fs.createWriteStream(path.join('captcha', `${captcha.value}.png`)));
+// captcha.JPEGStream.pipe(fs.createWriteStream(path.join('captcha', `${captcha.value}.jpeg`)));
 
 
 const app = express();
 app.use(express.static('bin'));
-app.get('/', (req, res) => {
-    res.cookie("Set-Cookie", `sid=${sid}; Max-Age=120; HttpOnly`);``
-    res.sendFile(__dir + 'bin/index.html');
+
+
+app.get('/lol', (req, res) => {
+    console.log(sid);
+
+    res.setHeader("Set-Cookie", `sid=${sid}; Max-Age=120; HttpOnly`);
+    res.sendFile(__dir+'/bin/index.html');
 });
+
+
 app.get('/login', (req, res) => {
     let cookies = req.header("Cookies");
     res.sendFile(__dir + '/bin/login.html');
@@ -64,5 +71,3 @@ function getSID() {
     let salt = Math.trunc(Math.random()*1000000000);
     return salt.toString(16) + Object.keys(sessions).length.toString(16) + time.toString(16);
 }
-
-const captcha = new Captcha.default();
