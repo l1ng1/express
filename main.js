@@ -23,9 +23,9 @@ let sessions = {};
 let sid = getSID();
 sessions[sid] = new Session(sid);
 
-// const captcha = new Captcha.default();
-// captcha.PNGStream.pipe(fs.createWriteStream(path.join('captcha', `${captcha.value}.png`)));
-// captcha.JPEGStream.pipe(fs.createWriteStream(path.join('captcha', `${captcha.value}.jpeg`)));
+const captcha = new Captcha.default();
+captcha.PNGStream.pipe(fs.createWriteStream(path.join('captcha', `${captcha.value}.png`)));
+captcha.JPEGStream.pipe(fs.createWriteStream(path.join('captcha', `${captcha.value}.jpeg`)));
 
 
 const app = express();
