@@ -2,6 +2,7 @@ import fs from "fs";
 import express from 'express';
 import bodyParser from "body-parser";
 import Captcha from 'captcha-generator-alphanumeric';
+import path from "path";
 const log = console.log;
 const __dir = process.cwd();
 log(__dir)
@@ -22,7 +23,9 @@ let sessions = {};
 let sid = getSID();
 sessions[sid] = new Session(sid);
 
-log(sessions);
+
+
+
 
 const app = express();
 app.use(express.static('bin'));
@@ -35,7 +38,10 @@ app.get('/login', (req, res) => {
     res.sendFile(__dir + '/bin/login.html');
 });
 app.post('/login', (req, res) => {
+    captcha.JPEGStream.pipe(fs.createWriteStream(path.join('captcha', `${captcha.value}.jpeg`)));
+    // let userSes = sessions.
     let cookies = req.header("Cookies");
+    
     res.sendFile(__dir + '/bin/login.html');
 });
 app.get('/register', (req, res) => {
@@ -58,3 +64,5 @@ function getSID() {
     let salt = Math.trunc(Math.random()*1000000000);
     return salt.toString(16) + Object.keys(sessions).length.toString(16) + time.toString(16);
 }
+
+const captcha = new Captcha.default();
