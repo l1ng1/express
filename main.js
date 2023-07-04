@@ -42,6 +42,7 @@ app.get('/lol', (req, res) => {
 
 app.get('/login', (req, res) => {
     let cookies = req.header("Cookies");
+    console.log(cookies);
     res.sendFile(__dir + '/bin/login.html');
 });
 app.post('/login', (req, res) => {
