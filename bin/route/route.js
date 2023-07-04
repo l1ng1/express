@@ -1,6 +1,6 @@
 // Импорт модуля 'express'
 import express from 'express';
-
+import bodyParser from 'body-parser';
 // Создание класса 'Router'
 export class Router{
     
@@ -12,6 +12,7 @@ export class Router{
         this.config = config;
         // Создание экземпляра приложения Express и присваивание его свойству 'app' экземпляра
         this.app = express();
+        this.app.use(bodyParser.urlencoded({extended:false}));
     }
     
     // Метод для запуска сервера
@@ -33,43 +34,22 @@ export class Router{
 
     // Метод для создания маршрутов
     createRoutes(){
-        // Определение маршрута для корневого URL ('/')
-        this.app.get('/' ,(req,res)=>{
-            // Проверка, есть ли у пользователя активная сессия
-            if(this.controller.isSession(req,res)){
-                // Если у пользователя есть активная сессия, вызов метода 'mainUserPage' контроллера
-                this.controller.mainUserPage(req,res);
-            } 
-            else{
-                // Если у пользователя нет активной сессии, вызов метода 'mainPageGeneral' контроллера
-                this.controller.mainPageGeneral(req,res);
-            }
-        });
 
-        // Определение маршрута для URL '/register'
-        this.app.get('/register',(req,res)=>{
-            // Проверка, есть ли у пользователя активная сессия
-            if(this.controller.isSession(req,res)){
-                // Если у пользователя есть активная сессия, вызов метода 'mainUserPage' контроллера
-                this.controller.mainUserPage(req,res);
-            } 
-            else{
-                // Если у пользователя нет активной сессии, вызов метода 'registrationPage' контроллера
-                this.controller.registrationPage(req,res);
-            }
-        });
+        this.app.get('/' , this.controller.mainUserPage,
+                           this.controller.mainPageGeneral);
+        
+        this.app.get('/register' , this.controller.mainUserPage,
+                                   this.controller.registrationPage);
 
-        // Определение маршрута для URL '/login'
-        this.app.get('/login',(req,res)=>{
-            // Проверка, есть ли у пользователя активная сессия
-            if(this.controller.isSession(req,res)){
-                // Если у пользователя есть активная сессия, вызов метода 'mainUserPage' контроллера
-                this.controller.mainUserPage(req,res);
-            } 
-            else{
-                // Если у пользователя нет активной сессии, вызов метода 'loginPage' контроллера
-                this.controller.loginPage(req,res);
-            }
-        });
+        this.app.get('/login' , this.controller.mainUserPage,
+                                this.controller.loginPage);
+
+        this.app.post('/confirm', this.controller.mainUserPage ,
+                                  this.controller.chekCaptcha,
+                                  this.controller.confirmPage);
+
+        this.app.post('/confirmed', this.controller.mainUserPage,
+                                    this.controller.chekConfirmCode,
+                                    this.controller.redirToUserPage);
     }
 }
