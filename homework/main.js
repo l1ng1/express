@@ -1,16 +1,9 @@
-import { Application } from "./bin/app.js";
-
-const config ={
-    database:{
-        file: "database.sdb"
-    },
-    server:{
-        port:3000
-    }
-}
-
-const app = new Application(config);
-app.start();
+import { Server } from './bin/server.js';
+const __dir = process.cwd();
+console.log(__dir);
+// Подключаю и запускаю сервер
+let server = new Server(__dir);
+server.start(3000);
 
 
 
@@ -28,7 +21,7 @@ app.start();
 // import Captcha from 'captcha-generator-alphanumeric';
 // import path from "path";
 // const log = console.log;
-// const __dir = process.cwd();
+
 // log(__dir);
 
 // // Функция для создания уникального Session ID
@@ -95,7 +88,7 @@ app.start();
 //     res.sendFile(__dir + '/bin/index-in.html');
 // });
 
-// // Запуск сервера на порту 3000
+// Запуск сервера на порту 3000
 // app.listen(3000, () => {
 //     console.log('server started');
 // });
