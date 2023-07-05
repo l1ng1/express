@@ -42,6 +42,17 @@ export class Service {
     }
 
 
+    newCaptcha(sid){
+        let session = this.sessions[sid];
+        session.captcha.file = 'captcha/' + sid + '.png'
+        session.captcha.value = this.captcha.create(filename);
+        return session.captcha.file;
+
+
+    }
+
+
+
 
 
 }
