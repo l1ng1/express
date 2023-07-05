@@ -1,4 +1,5 @@
-import {Session} from './session.js';
+import { SessionService } from './session.js';
+import { CaptchaService  } from './captcha.js';
 
 export class Service {
     sessions = {};
@@ -7,7 +8,7 @@ export class Service {
         this.dataStorage = dataStorage;
         this.session = new SessionService();
         this.captcha = new CaptchaService(this.session);
-        this.confirm = new ConfirmService(this.session);
+        // this.confirm = new ConfirmService(this.session);
     }
 
     isLogged(sid) {
@@ -32,6 +33,13 @@ export class Service {
         this.sessions[sid].step = step;
     }
 
+    newCaptcha(sid){
+        let session =this.sessions[sid];
+        session.captcha.file = 'captcha'+ sid + 'png';
+        session.captcha.value = this.captcha.create(session.captcha.file);
+        return session.captcha.file;
+    }
+
     checkCaptcha(sid, login, passw, email, captcha) {
         let session = this.sessions[sid];
         if (session.captcha.value === captcha) {
@@ -40,8 +48,5 @@ export class Service {
             session.captcha.value = null;
         }
     }
-
-
-
 
 }

@@ -49,9 +49,17 @@ export class Controller {
 
     registrationPage(req, res) {
         this.checkSid(req, res, 'registration');
+        const sid = this.getSid(req);
+        const captcha = this.service.newCaptcha(sid);
         const fname = path.join(this.dir, 'public', 'register.html');
-        res.sendFile(fname);
-
+        fs.readFile(fname, 'utf-8', (err, data) => {
+            if (data) {
+                const html = data.replace('%captcha%', captcha);
+                res.status(200).send(html);
+            } else {
+                res.status(404).send("<h2>Page not found :(</h2>");
+            }
+        });
     }
 
     loginPage(req, res) {

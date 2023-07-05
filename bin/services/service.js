@@ -1,7 +1,6 @@
 
 export  class Service {
     
-
     constructor(dataStorage) {
         this.dataStorage = dataStorage;
         this.session = new SessionService();

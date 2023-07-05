@@ -1,4 +1,4 @@
-export class Session {
+export class SessionService {
     constructor(expired) {
         this.step = 'index';
         this.userId = null;
