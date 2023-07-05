@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 export  class Service {
     
@@ -11,19 +12,20 @@ export  class Service {
     isLogged(sid) {
         let session = this.session.get(sid);
         return session.step == 'logged';
+=======
+export class Session {
+    constructor(expired) {
+        this.step = 'index';
+        this.userId = null;
+        this.captcha = {value: null, file: null};
+        this.expired = new Date();
+        this.expired.setSeconds( this.expired.getSeconds() + expired );
+>>>>>>> 8d6e706626d0a1dae93cf47adb8ae65acdebb150
     }
 
-    getUserData(sid) {
-        let session = this.session.get(sid);
-        let data = this.dataStorage.getUser(session.userId);
-        return data;
-    }
-
-    newSid(expireSeconds) {
-        return this.session.create(expireSeconds);
-    }
-
-    updateSesion() {
-        this.session.update(sid, step);
+    static newSid(sessionsTotal) {
+        let time = new Date().getTime();
+        let salt = Math.trunc(Math.random() * 1000000000);
+        return salt.toString(16) + sessionsTotal.toString(16) + time.toString(16);
     }
 }
