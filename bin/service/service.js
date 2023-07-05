@@ -48,5 +48,4 @@ export class Service {
             session.captcha.value = null;
         }
     }
-
 }
