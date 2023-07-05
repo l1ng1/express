@@ -1,30 +1,15 @@
-
-export  class Service {
-    
-
-    constructor(dataStorage) {
-        this.dataStorage = dataStorage;
-        this.session = new SessionService();
-        this.captcha = new CaptchaServise(this.session);
-        this.confirm = new ConfirmService(this.session);
-    }
-    
-    isLogged(sid) {
-        let session = this.session.get(sid);
-        return session.step == 'logged';
+export class Session {
+    constructor(expired) {
+        this.step = 'index';
+        this.userId = null;
+        this.captcha = {value: null, file: null};
+        this.expired = new Date();
+        this.expired.setSeconds( this.expired.getSeconds() + expired );
     }
 
-    getUserData(sid) {
-        let session = this.session.get(sid);
-        let data = this.dataStorage.getUser(session.userId);
-        return data;
-    }
-
-    newSid(expireSeconds) {
-        return this.session.create(expireSeconds);
-    }
-
-    updateSesion() {
-        this.session.update(sid, step);
+    static newSid(sessionsTotal) {
+        let time = new Date().getTime();
+        let salt = Math.trunc(Math.random() * 1000000000);
+        return salt.toString(16) + sessionsTotal.toString(16) + time.toString(16);
     }
 }
