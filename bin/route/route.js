@@ -1,75 +1,42 @@
-// Импорт модуля 'express'
-import express from 'express';
+import express from "express";
+import bodyParser from "body-parser";
 
-// Создание класса 'Router'
-export class Router{
-    
-    // Конструктор, принимающий 'controller' и 'config' в качестве параметров
-    constructor(controller,config){
-        // Присваивание значения параметра 'controller' свойству 'controller' экземпляра
+export class Router {
+    constructor(controller, config) {
         this.controller = controller;
-        // Присваивание значения параметра 'config' свойству 'config' экземпляра
         this.config = config;
-        // Создание экземпляра приложения Express и присваивание его свойству 'app' экземпляра
         this.app = express();
+        this.app.use(bodyParser.urlencoded({ extended: false }));
     }
-    
-    // Метод для запуска сервера
-    start(){
-        // Запуск сервера, слушая указанный порт в конфигурации
-        this.server = this.app.listen(this.config.port,()=>{
-            console.log('Сервер запущен на порту',this.config.port);
-        });
 
-        // Вызов метода 'createRoutes' для создания маршрутов
-        this.createRoutes();
+    start() {
+        this.server = this.app.listen(this.config.port, ()=>{
+            console.log("Server started at", this.config.port);
+        });
+        this.createRoutes()
     }
-    
-    // Метод для остановки сервера
-    stop(){
-        // Закрытие сервера
+
+    stop() {
         this.server.close();
     }
 
-    // Метод для создания маршрутов
-    createRoutes(){
-        // Определение маршрута для корневого URL ('/')
-        this.app.get('/' ,(req,res)=>{
-            // Проверка, есть ли у пользователя активная сессия
-            if(this.controller.isSession(req,res)){
-                // Если у пользователя есть активная сессия, вызов метода 'mainUserPage' контроллера
-                this.controller.mainUserPage(req,res);
-            } 
-            else{
-                // Если у пользователя нет активной сессии, вызов метода 'mainPageGeneral' контроллера
-                this.controller.mainPageGeneral(req,res);
-            }
-        });
+    createRoutes() {
+        this.app.get("/", this.controller.mainUserPage,
+                          this.controller.mainGeneralPage);
 
-        // Определение маршрута для URL '/register'
-        this.app.get('/register',(req,res)=>{
-            // Проверка, есть ли у пользователя активная сессия
-            if(this.controller.isSession(req,res)){
-                // Если у пользователя есть активная сессия, вызов метода 'mainUserPage' контроллера
-                this.controller.mainUserPage(req,res);
-            } 
-            else{
-                // Если у пользователя нет активной сессии, вызов метода 'registrationPage' контроллера
-                this.controller.registrationPage(req,res);
-            }
-        });
+        this.app.get("/register", this.controller.mainUserPage,
+                                  this.controller.registrationPage);
 
-        // Определение маршрута для URL '/login'
-        this.app.get('/login',(req,res)=>{
-            // Проверка, есть ли у пользователя активная сессия
-            if(this.controller.isSession(req,res)){
-                // Если у пользователя есть активная сессия, вызов метода 'mainUserPage' контроллера
-                this.controller.mainUserPage(req,res);
-            } 
-            else{
-                // Если у пользователя нет активной сессии, вызов метода 'loginPage' контроллера
-                this.controller.loginPage(req,res);
-            }
-        });
+        this.app.get("/login", this.controller.mainUserPage,
+                               this.controller.loginPage);
+
+        this.app.post("/confirm", this.controller.mainUserPage,
+                                  this.controller.checkCaptcha,
+                                  this.controller.confirmPage);
+
+        this.app.post("/confirmed", this.controller.mainUserPage,
+                                    this.controller.checkConfirmCode,
+                                    this.controller.redirToUserPage);
+
     }
 }
