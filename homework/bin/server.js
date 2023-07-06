@@ -2,7 +2,7 @@ import express from 'express';
 import { SID } from './SID.js'
 // import bodyParser from "body-parser";
 // import Captcha from 'captcha-generator-alphanumeric';
-// import path from "path";
+import path from "path";
 const log = console.log;
 
 
@@ -34,9 +34,9 @@ export class Server{
     constructor(__dir){
         this.app = express();
         // Путь до статичных файлов
-        this.publicPath = __dir + '/public';
+        // this.publicPath = __dir;
         // Подключение статичных файлов
-        this.app.use(express.static(this.publicPath));
+        this.app.use(express.static(path.join(process.cwd(), 'public')));
         // Подключение SID
         this.SID = new SID;
     }
@@ -60,16 +60,16 @@ export class Server{
             let sid = this.SID.createSession(); // Генерация идентификатора сессии
             console.log("  New SID =", sid);
             res.setHeader("Set-Cookie", `sid=${sid}; Max-Age=120; HttpOnly`);
-            res.sendFile(this.publicPath+'index.html');
+            res.sendFile(path.join(process.cwd(), 'public','index.html'));
         });
         this.app.get('/login', (req, res) => {
             let cookies = req.header("Cookies");
             log(cookies);
-            res.sendFile(this.publicPath + 'login.html');
+            res.sendFile(path.join(process.cwd(), 'public', 'login.html'));
         });
         this.app.get('/register', (req, res) => {
             let cookies = req.header("Cookies");
-            res.sendFile(this.publicPath + 'register.html');
+            res.sendFile(path.join(process.cwd(), 'public', 'register.html'));
         });
     }
 
@@ -80,15 +80,15 @@ export class Server{
             // let userSes = sessions.
             let cookies = this.getCookies(req.header("Cookies"));
             log('cookies: '+ cookies);
-            res.sendFile(this.publicPath + 'login.html');
+            res.sendFile(path.join(process.cwd(), 'public',+ 'login.html'));
         });
         this.app.post('/confirm', (req, res) => {
             let cookies = this.getCookies(req.header("Cookies"));
-            res.sendFile(this.publicPath + 'confirm.html');
+            res.sendFile(path.join(process.cwd(), 'public','confirm.html'));
         });
         this.app.post('/confirmed', (req, res) => {
             let cookies = this.getCookies(req.header("Cookies"));
-            res.sendFile(this.publicPath + 'index-in.html');
+            res.sendFile(path.join(process.cwd(), 'public','index-in.html'));
         });
     }
 
