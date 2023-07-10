@@ -1,27 +1,29 @@
+// Виталий, попробуйте залогиниться и выйти из учетки))))))))))
+// Все работает))))))))))
+
+
 import { SessionService } from './session.js';
 import { CaptchaService  } from './captcha.js';
+import path from "path";
+const log = console.log;
 
 export class Service {
     sessions = {};
 
     constructor(dataStorage) {
         this.dataStorage = dataStorage;
-        this.session = new SessionService();
         this.captcha = new CaptchaService(this.session);
         // this.confirm = new ConfirmService(this.session);
     }
 
     isLogged = (sid) => {
-        console.log(sid);
-        console.log(this.sessions);
         let session = this.sessions[sid];
-        console.log(session);
         return session?.step === 'logged';
     }
 
-    getUserData = (sid) => {
+    getUserData = async (sid) => {
         let session = this.sessions[sid];
-        let data = this.dataStorage.getUser(session.userId);
+        let data = await this.dataStorage.getUser(session.userId);
         return data;
     }
 
@@ -29,7 +31,6 @@ export class Service {
         let session = new SessionService(expireSeconds);
         let sid = session.newSid(Object.keys(this.sessions).length);
         this.sessions[sid] = session;
-        console.log(this.sessions);
         return sid;
     }
 
@@ -45,19 +46,51 @@ export class Service {
 
     newCaptcha = async (sid) => {
         let session =this.sessions[sid];
-        session.captcha.file = sid + '.png';
-        session.captcha.value = await this.captcha.create(session.captcha.file);
-        this.sessions[sid] = session;
-        console.log(this.sessions);
-        return session.captcha.file;
+        let captchaUrl = `tmp/captcha/${sid}.png`;
+        session.captcha.file = path.join(process.cwd(), 'public','tmp', 'captcha', `${sid}.png`);
+        session.captcha.value = await this.captcha.create(captchaUrl);
+        return captchaUrl;
     }
 
-    checkCaptcha = (sid, login, passw, email, captcha) => {
-        let session = this.sessions[sid];
+    checkCaptcha = async (sid, login, passw, email, captcha) => {
+        let session = this.sessions[sid]
         if (session.captcha.value === captcha) {
-            session.userId = this.dataStorage.addUser(login, passw, email);
+            session.userId = await this.dataStorage.addUser(login, passw, email);
             this.captcha.remove(session.captcha.file);
             session.captcha.value = null;
+            return true;
         }
+        return false;
     }
+
+    sendConfirmCode(sid) {
+        let session = this.sessions[sid];
+        session.confirmCode = getRandomInt();
+        log(`Код для подтверждения регистрации: ${session.confirmCode}`);
+    }
+
+    checkConfirmCode(sid, code) {
+        let session = this.sessions[sid];
+        if(session.confirmCode == code){
+            session.confirmCode = null;
+            return true;
+        } 
+        return false;
+    }
+
+    loginUser = async (sid ,login, passw) => {
+        let session = this.sessions[sid];
+        session.userId = await this.dataStorage.getUserId(login, passw);
+        if(session.userId) return true;
+        return false;
+    }
+
+    logOut(sid) {
+        let session = this.sessions[sid];
+        session.userId = null;
+    }
+}
+
+function getRandomInt() {
+    return Math.floor(Math.random() * 1000000);
 }

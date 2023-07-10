@@ -8,38 +8,43 @@ export class Router {
         this.config = config;
         this.app = express();
         this.app.use(bodyParser.urlencoded({ extended: false }));
-        // Виталий, когда подключаю че то перестала вообще грузится страница
-        // К тому же выходит ошибка будто я пытаюсь импортировать файл который нельзя импортировать!!!!!!!!!!
-        // this.app.use(express.static(path.join(process.cwd(), 'public')));
     }
 
-    start() {
+    async start() {
         this.server = this.app.listen(this.config.port, () => {
             console.log("Server started at", this.config.port);
         });
-        this.createRoutes();
+        await this.createRoutes();
+        this.app.use(express.static(path.join(process.cwd(), 'public')));
     }
 
     stop() {
         this.server.close();
     }
 
-    createRoutes() {
+    async createRoutes() {
         this.app.get("/", this.controller.mainUserPage,
                           this.controller.mainGeneralPage);
 
         this.app.get("/register", this.controller.mainUserPage,
-                                  this.controller.registrationPage);
+                                  await this.controller.registrationPage);
 
         this.app.get("/login", this.controller.mainUserPage,
                                this.controller.loginPage);
 
+        this.app.post("/log",   this.controller.mainUserPage,
+                               await this.controller.checkloginData,
+                               this.controller.redirToUserPage);
+
         this.app.post("/confirm", this.controller.mainUserPage,
-                                  this.controller.checkCaptcha,
+                                  await this.controller.checkCaptcha,
                                   this.controller.confirmPage);
 
-        this.app.post("/confirmed", this.controller.mainUserPage,
+        this.app.post("/confirmed",      this.controller.mainUserPage,
                                     this.controller.checkConfirmCode,
                                     this.controller.redirToUserPage);
+
+        this.app.get("/logout",    this.controller.logOutUser,
+                                    this.controller.redirToGeneralPage);
     }
 }
